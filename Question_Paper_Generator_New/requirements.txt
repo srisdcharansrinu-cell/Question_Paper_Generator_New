@@ -1,8 +1,8 @@
 Flask
 reportlab
 python-docx
+pytesseract
 pypdf
 Pillow
-pytesseract
 PyMuPDF
-Werkzeug
+gunicorn
