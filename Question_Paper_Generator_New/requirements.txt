@@ -1,0 +1,8 @@
+Flask
+reportlab
+python-docx
+pypdf
+Pillow
+pytesseract
+PyMuPDF
+Werkzeug
