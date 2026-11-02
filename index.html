@@ -1,0 +1,242 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>St. Ann's Question Paper Generator</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#eef2f6;
+    color:#222;
+}
+header{
+    background:#073b50;
+    color:white;
+    text-align:center;
+    padding:20px 10px;
+}
+header h2{margin:0 0 6px;font-size:23px}
+header p{margin:0;font-size:13px}
+.container{
+    max-width:1050px;
+    margin:22px auto;
+    padding:15px;
+}
+.card{
+    background:white;
+    padding:22px;
+    margin-bottom:20px;
+    border-radius:10px;
+    box-shadow:0 2px 10px #00000012;
+}
+h3{
+    color:#07536c;
+    border-bottom:2px solid #dce6ec;
+    padding-bottom:9px;
+    margin-top:0;
+}
+label{
+    display:block;
+    font-weight:bold;
+    margin:12px 0 5px;
+}
+input,textarea{
+    width:100%;
+    padding:10px;
+    border:1px solid #bdcbd4;
+    border-radius:5px;
+    font-size:14px;
+    font-family:Arial,sans-serif;
+}
+textarea{min-height:55px;resize:vertical}
+.grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+}
+.question-row{
+    margin-bottom:10px;
+}
+button,.download{
+    display:inline-block;
+    padding:12px 20px;
+    background:#07536c;
+    color:white;
+    border:0;
+    border-radius:5px;
+    cursor:pointer;
+    font-size:14px;
+    text-decoration:none;
+    margin:5px 5px 5px 0;
+}
+button:hover,.download:hover{background:#087d91}
+.upload-btn{background:#287343}
+.message{
+    background:#e5f5e9;
+    padding:12px;
+    margin-bottom:12px;
+    border-radius:5px;
+    color:#185b2c;
+}
+.note{
+    color:#666;
+    font-size:13px;
+}
+@media(max-width:650px){
+    .grid{grid-template-columns:1fr}
+    .card{padding:15px}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h2>ST. ANN'S COLLEGE FOR WOMEN (A)</h2>
+    <p>QUESTION PAPER GENERATOR</p>
+</header>
+
+<div class="container">
+
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+    {% for message in messages %}
+    <div class="message">{{ message }}</div>
+    {% endfor %}
+{% endif %}
+{% endwith %}
+
+{% if upload_message %}
+<div class="message">{{ upload_message }}</div>
+{% endif %}
+
+<div class="card">
+<h3>Upload Question Paper / Study Material</h3>
+
+<form action="/upload" method="POST" enctype="multipart/form-data">
+    <label>Select PDF / Word / JPG / PNG File</label>
+    <input type="file" name="source_file"
+           accept=".pdf,.docx,.jpg,.jpeg,.png">
+    <button type="submit" class="upload-btn">Upload & Extract Text</button>
+</form>
+
+{% if extracted_text %}
+<label>Extracted Text – Editable</label>
+<textarea rows="10">{{ extracted_text }}</textarea>
+{% endif %}
+
+<p class="note">
+Supported formats: PDF, DOCX, JPG and PNG.
+Image OCR requires English Tesseract installation.
+</p>
+</div>
+
+<form action="/preview" method="POST">
+
+<div class="card">
+<h3>College & Examination Details</h3>
+
+<label>Course Code</label>
+<input name="course_code" value="{{ data.course_code }}">
+
+<label>College Name</label>
+<input name="college" value="{{ data.college }}">
+
+<label>College Type</label>
+<input name="autonomous" value="{{ data.autonomous }}">
+
+<label>Address</label>
+<input name="address" value="{{ data.address }}">
+
+<label>Examination</label>
+<input name="exam" value="{{ data.exam }}">
+
+<label>Admitted Batch</label>
+<input name="batch" value="{{ data.batch }}">
+
+<label>Subject</label>
+<input name="subject" value="{{ data.subject }}">
+
+<label>Paper Title</label>
+<textarea name="paper_title">{{ data.paper_title }}</textarea>
+
+<div class="grid">
+    <div>
+        <label>Time</label>
+        <input name="time" value="{{ data.time }}">
+    </div>
+    <div>
+        <label>Maximum Marks</label>
+        <input name="max_marks" value="{{ data.max_marks }}">
+    </div>
+</div>
+</div>
+
+<div class="card">
+<h3>Section – A</h3>
+
+<label>Instruction</label>
+<input name="section_a_instruction"
+       value="{{ data.section_a_instruction }}">
+
+<label>Marks</label>
+<input name="section_a_marks"
+       value="{{ data.section_a_marks }}">
+
+{% for i in range(8) %}
+<div class="question-row">
+    <label>Question {{ i+1 }}</label>
+    <textarea name="section_a[]">{{ data.section_a[i] if i < data.section_a|length else '' }}</textarea>
+</div>
+{% endfor %}
+</div>
+
+<div class="card">
+<h3>Section – B</h3>
+
+<label>Instruction</label>
+<input name="section_b_instruction"
+       value="{{ data.section_b_instruction }}">
+
+<label>Marks</label>
+<input name="section_b_marks"
+       value="{{ data.section_b_marks }}">
+
+<h3>Questions – (a)</h3>
+
+{% for i in range(5) %}
+<div class="question-row">
+    <label>Question {{ i+9 }} (a)</label>
+    <textarea name="section_b_a[]">{{ data.section_b_a[i] if i < data.section_b_a|length else '' }}</textarea>
+</div>
+{% endfor %}
+
+<h3>Questions – (b)</h3>
+
+{% for i in range(5) %}
+<div class="question-row">
+    <label>Question {{ i+9 }} (b)</label>
+    <textarea name="section_b_b[]">{{ data.section_b_b[i] if i < data.section_b_b|length else '' }}</textarea>
+</div>
+{% endfor %}
+
+<p class="note">
+(a) question తర్వాత OR మధ్యలో వస్తుంది.
+(b) కింద వస్తుంది. Question number మళ్లీ repeat కాదు.
+</p>
+</div>
+
+<div class="card">
+<button type="submit">Generate Question Paper Preview</button>
+</div>
+
+</form>
+
+</div>
+</body>
+</html>
